@@ -128,7 +128,7 @@ pub fn compile_command(
         }
 
         let text = std::fs::read_to_string(src_path)?;
-        let rendered = template::render_var_only(&rel_str, &text, &data)?;
+        let rendered = template::render_var_if_only(&rel_str, &text, &data)?;
 
         // Enforce output size limit (10 MB default per spec)
         let max_bytes: usize = 10 * 1024 * 1024;
