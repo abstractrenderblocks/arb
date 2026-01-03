@@ -20,6 +20,15 @@ pub enum ArbError {
     #[error("Schema validation failed with {0} error(s)")]
     ValidationFailed(usize),
 
+    #[error("Template error in {path}:{line}:{col}: {message}")]
+    Template {
+        path: String,
+        line: usize,
+        col: usize,
+        message: String,
+    },
+
+
     #[error("{0}")]
     Other(String),
 }
