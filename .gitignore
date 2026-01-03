@@ -9,3 +9,14 @@ Cargo.lock
 # OS
 .DS_Store
 Thumbs.db
+out/
+build/
+dist/
+target/
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.log
+*.tmp
