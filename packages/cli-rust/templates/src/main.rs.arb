@@ -1,0 +1,74 @@
+use clap::{Parser, Subcommand};
+
+#[derive(Parser, Debug)]
+#[command(name = "{var}tool.bin{/var}", version = "{var}tool.version{/var}", about = "{var}tool.description{/var}")]
+struct Cli {
+{if}global_flags
+{rep}global_flags
+    #[arg({if}short short='{var}short{/var}', {/if}long="{var}long{/var}", help="{var}help{/var}")]
+    {var}ident{/var}: bool,
+{/rep}
+{/if}
+
+{if}global_options
+{rep}global_options
+    #[arg({if}short short='{var}short{/var}', {/if}long="{var}long{/var}", {if}default default_value="{var}default{/var}", {/if}help="{var}help{/var}")]
+{if}required
+    {var}ident{/var}: {var}type{/var},
+{/if}
+{if}optional
+    {var}ident{/var}: Option<{var}type{/var}>,
+{/if}
+{/rep}
+{/if}
+
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand, Debug)]
+enum Commands {
+{rep}commands
+    #[command(name = "{var}name{/var}", about = "{var}summary{/var}")]
+    {var}ident{/var} {
+{if}args
+{rep}args
+        #[arg(name="{var}name{/var}", help="{var}help{/var}")]
+        {var}ident{/var}: String,
+{/rep}
+{/if}
+
+{if}flags
+{rep}flags
+        #[arg({if}short short='{var}short{/var}', {/if}long="{var}long{/var}", help="{var}help{/var}")]
+        {var}ident{/var}: bool,
+{/rep}
+{/if}
+
+{if}options
+{rep}options
+        #[arg({if}short short='{var}short{/var}', {/if}long="{var}long{/var}", {if}default default_value="{var}default{/var}", {/if}help="{var}help{/var}")]
+{if}required
+        {var}ident{/var}: {var}type{/var},
+{/if}
+{if}optional
+        {var}ident{/var}: Option<{var}type{/var}>,
+{/if}
+{/rep}
+{/if}
+    },
+{/rep}
+}
+
+fn main() {
+    let cli = Cli::parse();
+
+    match cli.command {
+{rep}commands
+        Commands::{var}ident{/var} { .. } => {
+            // TODO: implement
+            println!("{var}name{/var}: TODO");
+        }
+{/rep}
+    }
+}

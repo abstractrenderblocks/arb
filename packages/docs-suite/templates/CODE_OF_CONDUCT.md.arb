@@ -1,0 +1,7 @@
+# Code of Conduct
+
+{if}policies.code_of_conduct
+{var}policies.code_of_conduct{/var}
+{/if}
+
+We want a friendly, professional community. Be respectful and assume good intent.

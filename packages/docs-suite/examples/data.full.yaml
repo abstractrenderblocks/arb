@@ -1,0 +1,31 @@
+tool:
+  name: "AcmeSync"
+  bin: "acmesync"
+  version: "0.1.0"
+  license: "Apache-2.0"
+  description: "Fast, predictable sync jobs with clean operator output."
+  repo_url: "https://github.com/acme/acmesync"
+
+global_flags:
+  - long: "verbose"
+    short: "v"
+    help: "Enable verbose logging."
+
+commands:
+  - name: "sync"
+    summary: "Run a one-shot sync."
+    args:
+      - name: "source"
+        help: "Source directory."
+      - name: "dest"
+        help: "Destination (path or URL)."
+    flags:
+      - long: "dry-run"
+        help: "Print what would happen without making changes."
+    examples:
+      - "acmesync sync ./in ./out --dry-run"
+
+  - name: "status"
+    summary: "Show configuration and last run."
+    examples:
+      - "acmesync status"

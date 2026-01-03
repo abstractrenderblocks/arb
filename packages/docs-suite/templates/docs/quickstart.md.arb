@@ -1,0 +1,23 @@
+# Quickstart
+
+## 1) Validate your data
+
+```cmd
+arb validate --package docs-suite --data data.yaml
+```
+
+## 2) Compile outputs
+
+```cmd
+arb compile --package docs-suite --data data.yaml --out out
+```
+
+arb writes files into `out/`, preserving directory structure under `templates/`.
+
+## 3) Iterate
+
+Change:
+- the data (safe, validated)
+- the templates (presentation/structure)
+
+Regenerate any time.

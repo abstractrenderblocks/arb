@@ -1,0 +1,46 @@
+.TH ARB 1
+.SH NAME
+arb \- {var}description{/var}
+.SH SYNOPSIS
+.B arb
+.RI [command] " [options]"
+.SH DESCRIPTION
+{var}project.name{/var} is a deterministic recursive text compiler for structured generation.
+.SH COMMON OPTIONS
+.TP
+.B --package
+Package name or explicit filesystem path.
+.TP
+.B --data
+Path to input YAML data file.
+.TP
+.B --out
+Output directory.
+.TP
+.B --verbose
+Enable verbose diagnostics.
+.TP
+.B --quiet
+Suppress non-error output.
+.SH COMMANDS
+{rep}commands
+.TP
+.B {var}name{/var}
+{var}summary{/var}
+{if}examples
+.RS
+Examples:
+{rep}examples
+.br
+{var}.{/var}
+{/rep}
+.RE
+{/if}
+{/rep}
+.SH FILES
+arb operates on:
+- a package directory containing schema.yaml and templates/
+- a YAML data file validated against the schema
+- an output directory that receives generated files
+.SH LICENSE
+{var}project.license{/var}

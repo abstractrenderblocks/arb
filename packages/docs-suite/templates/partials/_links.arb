@@ -1,0 +1,10 @@
+- Docs: {var}links.docs{/var}
+{if}links.issues
+- Issues: {var}links.issues{/var}
+{/if}
+{if}links.discussions
+- Discussions: {var}links.discussions{/var}
+{/if}
+{if}links.security
+- Security: {var}links.security{/var}
+{/if}

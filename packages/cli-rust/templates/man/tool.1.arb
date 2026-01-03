@@ -1,0 +1,16 @@
+.TH {var}tool.bin{/var} 1
+.SH NAME
+{var}tool.bin{/var} \- {var}tool.description{/var}
+.SH SYNOPSIS
+.B {var}tool.bin{/var}
+.RI [options] " <command> " [command-options]
+.SH DESCRIPTION
+{var}tool.description{/var}
+.SH COMMANDS
+{rep}commands
+.TP
+.B {var}name{/var}
+{var}summary{/var}
+{/rep}
+.SH LICENSE
+{var}tool.license{/var}

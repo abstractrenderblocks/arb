@@ -1,0 +1,27 @@
+# Overview
+
+**{var}project.name{/var}** is a deterministic recursive text compiler for structured generation.
+
+## What you get
+
+{rep}sections.overview_points
+- {var}.{/var}
+{/rep}
+
+## Core guarantees
+
+- Deterministic output (same inputs -> same bytes)
+- No code execution in templates
+- Schema validation happens before rendering
+- Safe recursion: cycle detection + depth/size limits
+- Fail fast on the first error
+
+## When it fits
+
+Use arb when:
+- one source of truth must drive many outputs
+- consistency matters more than convenience
+- you want deterministic rebuilds
+
+Avoid arb when:
+- you need runtime side effects or arbitrary computation in templates

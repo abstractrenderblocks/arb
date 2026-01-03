@@ -1,0 +1,71 @@
+project:
+  name: "AcmeSync"
+  license: MIT
+  audience: "Ops teams who need predictable sync jobs and clean runbooks."
+repo:
+  owner: acme
+  name: acmesync
+tagline: "One config. Every doc."
+description: "Generate operator docs, runbooks, and man pages from one YAML file."
+
+install:
+  windows_cmd: choco install acmesync
+  mac_linux: brew install acmesync
+
+links:
+  docs: docs/index.md
+  issues: https://github.com/acme/acmesync/issues
+
+mkdocs:
+  enabled: true
+  site_name: "AcmeSync"
+  repo_url: "https://github.com/acme/acmesync"
+  theme: "readthedocs"
+  nav:
+    - title: Home
+      path: index.md
+    - title: Quickstart
+      path: quickstart.md
+    - title: Troubleshooting
+      path: troubleshooting.md
+
+sections:
+  overview_points:
+    - "Runbooks and docs generated from one validated file."
+    - "Troubleshooting playbook entries live in YAML so they stay consistent."
+  faq:
+    - q: "Do I commit generated docs?"
+      a: "Many teams do. Others regenerate in CI. Both work because outputs are deterministic."
+  troubleshooting:
+    - symptom: "Sync job exits with code 7"
+      cause: "Remote endpoint is unreachable or credentials are wrong."
+      fix: "Verify connectivity, then rotate credentials and rerun."
+
+examples:
+  basic_data_yaml: |
+    project:
+      name: AcmeSync
+      license: MIT
+    repo:
+      owner: acme
+      name: acmesync
+    tagline: "One config. Every doc."
+    description: "Generate docs and runbooks from one YAML file."
+    commands:
+      - name: sync
+        summary: "Run a one-shot sync."
+  basic_package_tree: |
+    schema.yaml
+    templates/
+      README.md.arb
+      docs/
+        index.md.arb
+        troubleshooting.md.arb
+      man/
+        acmesync.1.arb
+
+commands:
+  - name: sync
+    summary: Run a one-shot sync.
+    examples:
+      - acmesync sync --source ./in --dest s3://bucket/path

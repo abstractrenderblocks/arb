@@ -1,0 +1,101 @@
+type: object
+required: [tool, commands]
+properties:
+  tool:
+    type: object
+    required: [name, bin, version, license, description, repo_url]
+    properties:
+      name: { type: string }
+      bin: { type: string }
+      version: { type: string }
+      license: { type: string }
+      description: { type: string }
+      repo_url: { type: string }
+
+  global_flags:
+    type: list
+    items:
+      type: object
+      required: [long, ident, help]
+      properties:
+        long: { type: string }
+        ident: { type: string }
+        help: { type: string }
+        short: { type: string }
+
+  global_options:
+    type: list
+    items:
+      type: object
+      required: [long, ident, help, type]
+      properties:
+        long: { type: string }
+        ident: { type: string }
+        help: { type: string }
+        short: { type: string }
+
+        # Rust type token, e.g. String, u64, i64, f64, bool
+        type: { type: string }
+
+        # Because arb v1 has no "else", the data must mark one of these.
+        required: { type: boolean }
+        optional: { type: boolean }
+
+        # If provided, becomes default_value="...".
+        default: { type: string }
+
+  commands:
+    type: list
+    items:
+      type: object
+      required: [name, ident, summary]
+      properties:
+        name: { type: string }
+        ident: { type: string }
+        summary: { type: string }
+
+        args:
+          type: list
+          items:
+            type: object
+            required: [name, ident, help]
+            properties:
+              name: { type: string }
+              ident: { type: string }
+              help: { type: string }
+
+        flags:
+          type: list
+          items:
+            type: object
+            required: [long, ident, help]
+            properties:
+              long: { type: string }
+              ident: { type: string }
+              help: { type: string }
+              short: { type: string }
+
+        options:
+          type: list
+          items:
+            type: object
+            required: [long, ident, help, type]
+            properties:
+              long: { type: string }
+              ident: { type: string }
+              help: { type: string }
+              short: { type: string }
+
+              # Rust type token
+              type: { type: string }
+
+              # One of these should be true in the data file.
+              required: { type: boolean }
+              optional: { type: boolean }
+
+              default: { type: string }
+
+        examples:
+          type: list
+          items:
+            type: string

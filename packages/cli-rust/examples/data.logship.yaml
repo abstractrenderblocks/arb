@@ -1,0 +1,95 @@
+tool:
+  name: "LogShip"
+  bin: "logship"
+  version: "0.2.0"
+  license: "Apache-2.0"
+  description: "Ship logs to a remote endpoint with safe, inspectable runs."
+  repo_url: "https://github.com/example/logship"
+
+global_flags:
+  - long: "verbose"
+    ident: "verbose"
+    short: "v"
+    help: "Enable verbose logging."
+  - long: "json"
+    ident: "json"
+    help: "Emit machine-readable JSON output."
+
+global_options:
+  - long: "config"
+    ident: "config"
+    short: "c"
+    help: "Path to a config file."
+    type: "String"
+    optional: true
+    default: "./logship.yaml"
+
+
+commands:
+  - name: "init"
+    ident: "Init"
+    summary: "Create a starter config file."
+    args:
+      - name: "path"
+        ident: "path"
+        help: "Where to write the config file."
+    flags:
+      - long: "force"
+        ident: "force"
+        help: "Overwrite an existing file."
+    examples:
+      - "logship init ./logship.yaml"
+      - "logship init ./logship.yaml --force"
+
+  - name: "push"
+    ident: "Push"
+    summary: "Send a batch of logs."
+    args:
+      - name: "input"
+        ident: "input"
+        help: "Path to a log file (or directory)."
+      - name: "endpoint"
+        ident: "endpoint"
+        help: "Destination endpoint URL."
+    flags:
+      - long: "dry-run"
+        ident: "dry_run"
+        help: "Print what would happen without sending data."
+    options:
+      - long: "max-bytes"
+        ident: "max_bytes"
+        help: "Maximum bytes to send in one batch."
+        type: "u64"
+        optional: true
+        default: "10485760"
+
+      - long: "timeout"
+        ident: "timeout"
+        short: "t"
+        help: "Request timeout (seconds)."
+        type: "u64"
+        optional: true
+        default: "30"
+
+    examples:
+      - "logship push ./app.log https://logs.example.com/ingest"
+      - "logship push ./logs https://logs.example.com/ingest --dry-run"
+      - "logship push ./app.log https://logs.example.com/ingest --max-bytes 1048576 --timeout 10"
+
+  - name: "status"
+    ident: "Status"
+    summary: "Show effective configuration and last run state."
+    examples:
+      - "logship status"
+      - "logship status --json"
+
+  - name: "doctor"
+    ident: "Doctor"
+    summary: "Run environment checks and print diagnostics."
+    flags:
+      - long: "network"
+        ident: "network"
+        help: "Include network reachability tests."
+    examples:
+      - "logship doctor"
+      - "logship doctor --network"

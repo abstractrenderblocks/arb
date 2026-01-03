@@ -1,0 +1,19 @@
+# Security Policy
+
+## Supported versions
+
+{if}policies.supported_versions
+{var}policies.supported_versions{/var}
+{/if}
+
+## Reporting a vulnerability
+
+{if}policies.security_email
+Email: {var}policies.security_email{/var}
+{/if}
+
+{if}policies.disclosure_policy
+{var}policies.disclosure_policy{/var}
+{/if}
+
+Do not open a public issue for sensitive reports.

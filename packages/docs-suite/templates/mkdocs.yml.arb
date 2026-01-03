@@ -1,0 +1,18 @@
+{if}mkdocs.enabled
+site_name: "{var}mkdocs.site_name{/var}"
+{if}mkdocs.site_url
+site_url: "{var}mkdocs.site_url{/var}"
+{/if}
+{if}mkdocs.repo_url
+repo_url: "{var}mkdocs.repo_url{/var}"
+{/if}
+{if}mkdocs.theme
+theme:
+  name: "{var}mkdocs.theme{/var}"
+{/if}
+
+nav:
+{rep}mkdocs.nav
+  - {var}title{/var}: {var}path{/var}
+{/rep}
+{/if}

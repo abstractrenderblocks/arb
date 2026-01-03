@@ -1,0 +1,14 @@
+# {var}project.name{/var}
+
+Welcome to the documentation site for **{var}project.name{/var}**.
+
+Start here:
+- [Overview](overview.md)
+- [Quickstart](quickstart.md)
+- [Configuration](configuration.md)
+- [FAQ](faq.md)
+- [Troubleshooting](troubleshooting.md)
+
+{if}links.issues
+For bugs and requests, use the issue tracker: {var}links.issues{/var}
+{/if}

@@ -1,0 +1,51 @@
+\
+use clap::{Parser, Subcommand};
+
+#[derive(Parser, Debug)]
+#[command(name = "{var}tool.bin{/var}", version = "{var}tool.version{/var}", about = "{var}tool.description{/var}")]
+struct Cli {
+{rep}global_flags
+    #[arg({if}short short='{var}short{/var}', {/if}long="{var}long{/var}", help="{var}help{/var}")]
+    {var}long{/var}: bool,
+{/rep}
+{rep}global_options
+    #[arg({if}short short='{var}short{/var}', {/if}long="{var}long{/var}", help="{var}help{/var}")]
+    {var}long{/var}: String,
+{/rep}
+
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand, Debug)]
+enum Commands {
+{rep}commands
+    #[command(about = "{var}summary{/var}")]
+    {var}name{/var} {
+{rep}args
+        #[arg(help="{var}help{/var}")]
+        {var}name{/var}: String,
+{/rep}
+{rep}flags
+        #[arg({if}short short='{var}short{/var}', {/if}long="{var}long{/var}", help="{var}help{/var}")]
+        {var}long{/var}: bool,
+{/rep}
+{rep}options
+        #[arg({if}short short='{var}short{/var}', {/if}long="{var}long{/var}", help="{var}help{/var}")]
+        {var}long{/var}: String,
+{/rep}
+    },
+{/rep}
+}
+
+fn main() {
+    let cli = Cli::parse();
+    match cli.command {
+{rep}commands
+        Commands::{var}name{/var} { .. } => {
+            // TODO: implement
+            println!("{var}name{/var}: TODO");
+        }
+{/rep}
+    }
+}

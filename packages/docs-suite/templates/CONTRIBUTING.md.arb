@@ -1,0 +1,21 @@
+# Contributing
+
+Thanks for taking a look at {var}project.name{/var}.
+
+## Ground rules
+
+- Keep generation deterministic (no timestamps, random values, or env-dependent output)
+- Keep templates declarative (arb is not a scripting language)
+- Prefer clear errors over “best effort” output
+
+## Reporting issues
+
+{if}links.issues
+Use the issue tracker: {var}links.issues{/var}
+{/if}
+
+Include:
+- arb version
+- package version / commit
+- minimal data.yaml + template reproducer
+- expected vs actual output

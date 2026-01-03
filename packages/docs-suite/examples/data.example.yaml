@@ -1,0 +1,88 @@
+project:
+  name: Abstract Render Blocks
+  license: Apache-2.0
+  audience: "Tool authors, platform teams, and maintainers who need repeatable generation."
+repo:
+  owner: AbstractRenderBlocks
+  name: arb
+tagline: One source of truth. Many outputs.
+description: Deterministic recursive text compiler for structured generation.
+
+install:
+  windows_cmd: cargo install arb-cli
+  mac_linux: cargo install arb-cli
+  from_source: cargo build --release
+
+links:
+  docs: docs/overview.md
+  issues: https://github.com/AbstractRenderBlocks/arb/issues
+  discussions: https://github.com/AbstractRenderBlocks/arb/discussions
+  security: SECURITY.md
+
+policies:
+  security_email: security@abstractrenderblocks.com
+  supported_versions: "Only the latest minor release is supported for security fixes."
+  disclosure_policy: |
+    We follow coordinated disclosure.
+    If you report a vulnerability privately, we will respond within 72 hours
+    and provide a target fix timeline.
+
+sections:
+  overview_points:
+    - "Schema-first: validate data before rendering anything."
+    - "Minimal template language: var/if/rep/inc only."
+    - "Safe recursion limits: include cycles, include depth, expansion depth, output size."
+    - "Packages are shareable and versionable."
+  faq:
+    - q: "Is arb a programming language?"
+      a: "No. It is a deterministic compiler for structured generation. Logic lives in templates; data lives in YAML; schemas prevent drift."
+    - q: "Can I generate configs and code?"
+      a: "Yes, for scaffolding and consistency, not for inventing arbitrary applications. arb excels when outputs share a common structured source."
+    - q: "Why schema validation first?"
+      a: "Because partial output is worse than no output. If the data is wrong, fail fast and tell the user exactly where."
+  troubleshooting:
+    - symptom: "missing value at path 'foo.bar'"
+      cause: "Your template references a value that is missing in data.yaml."
+      fix: "Add the field to data.yaml, or make it optional and wrap it in {if}."
+    - symptom: "include cycle detected"
+      cause: "Two templates include each other directly or indirectly."
+      fix: "Break the cycle by removing one include or restructuring partials."
+    - symptom: "include depth limit exceeded"
+      cause: "An include chain is too deep (often an accidental recursion)."
+      fix: "Check the include chain and reduce nesting; raise the limit only if you truly need it."
+
+examples:
+  basic_data_yaml: |
+    project:
+      name: My Tool
+      license: MIT
+    repo:
+      owner: myorg
+      name: mytool
+    tagline: "One source of truth. Many outputs."
+    description: "Generate docs and metadata from one file."
+    commands:
+      - name: run
+        summary: "Run the tool."
+  basic_package_tree: |
+    schema.yaml
+    templates/
+      README.md.arb
+      docs/
+        overview.md.arb
+      man/
+        mytool.1.arb
+
+commands:
+  - name: validate
+    summary: Validate input data against a package schema.
+    examples:
+      - arb validate --package docs-suite --data data.yaml
+  - name: compile
+    summary: Validate data and render templates into output files.
+    examples:
+      - arb compile --package docs-suite --data data.yaml --out out
+  - name: init
+    summary: Generate a starter data file from a package schema.
+    examples:
+      - arb init --package docs-suite --out data.yaml

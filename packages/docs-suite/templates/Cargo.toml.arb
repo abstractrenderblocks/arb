@@ -1,0 +1,16 @@
+[package]
+name = "{var}tool.bin{/var}"
+version = "{var}tool.version{/var}"
+edition = "2021"
+license = "{var}tool.license{/var}"
+description = "{var}tool.description{/var}"
+{if}tool.repo_url
+repository = "{var}tool.repo_url{/var}"
+{/if}
+
+[[bin]]
+name = "{var}tool.bin{/var}"
+path = "main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }

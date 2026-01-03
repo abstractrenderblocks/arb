@@ -1,0 +1,73 @@
+type: object
+required: [tool, commands]
+properties:
+  tool:
+    type: object
+    required: [name, bin, version, license, description]
+    properties:
+      name: { type: string }
+      bin: { type: string }
+      version: { type: string }
+      license: { type: string }
+      description: { type: string }
+      repo_url: { type: string }
+
+  global_flags:
+    type: list
+    items:
+      type: object
+      required: [long, help]
+      properties:
+        long: { type: string }
+        short: { type: string }
+        help: { type: string }
+
+  global_options:
+    type: list
+    items:
+      type: object
+      required: [long, help]
+      properties:
+        long: { type: string }
+        short: { type: string }
+        help: { type: string }
+        value_name: { type: string }
+
+  commands:
+    type: list
+    items:
+      type: object
+      required: [name, summary]
+      properties:
+        name: { type: string }
+        summary: { type: string }
+        args:
+          type: list
+          items:
+            type: object
+            required: [name, help]
+            properties:
+              name: { type: string }
+              help: { type: string }
+        flags:
+          type: list
+          items:
+            type: object
+            required: [long, help]
+            properties:
+              long: { type: string }
+              short: { type: string }
+              help: { type: string }
+        options:
+          type: list
+          items:
+            type: object
+            required: [long, help]
+            properties:
+              long: { type: string }
+              short: { type: string }
+              help: { type: string }
+              value_name: { type: string }
+        examples:
+          type: list
+          items: { type: string }

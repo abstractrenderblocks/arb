@@ -1,0 +1,49 @@
+# Usage
+
+Generated usage for **{var}tool.bin{/var}**.
+
+{var}tool.description{/var}
+
+## Global Flags
+{if}global_flags
+{rep}global_flags
+- `{if}short-{var}short{/var}, {/if}--{var}long{/var}` — {var}help{/var}
+{/rep}
+{/if}
+
+## Commands
+
+{rep}commands
+## {var}name{/var}
+
+{var}summary{/var}
+
+{if}args
+**Args**
+{rep}args
+- `{var}name{/var}` — {var}help{/var}
+{/rep}
+{/if}
+
+{if}flags
+**Flags**
+{rep}flags
+- `{if}short-{var}short{/var}, {/if}--{var}long{/var}` — {var}help{/var}
+{/rep}
+{/if}
+
+{if}options
+**Options**
+{rep}options
+- `{if}short-{var}short{/var}, {/if}--{var}long{/var} <value>` — {var}help{/var}
+{/rep}
+{/if}
+
+{if}examples
+**Examples**
+{rep}examples
+- `{var}.{/var}`
+{/rep}
+{/if}
+
+{/rep}

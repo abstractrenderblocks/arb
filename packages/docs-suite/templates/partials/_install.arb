@@ -1,0 +1,19 @@
+### Windows (cmd.exe)
+
+```cmd
+{var}install.windows_cmd{/var}
+```
+
+### macOS / Linux
+
+```bash
+{var}install.mac_linux{/var}
+```
+
+{if}install.from_source
+### Build from source
+
+```bash
+{var}install.from_source{/var}
+```
+{/if}

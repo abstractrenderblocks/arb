@@ -47,7 +47,7 @@ arb provides the following guarantees:
   Includes are cycle-checked and bounded by depth and size limits.
 
 - **Fail-fast behavior**  
-  On error, no partial output is produced.
+  On error, no partial output is produced. arb does not delete previous output unless a compile completes successfully.
 
 These guarantees are defined in [`SPEC.md`](SPEC.md).
 

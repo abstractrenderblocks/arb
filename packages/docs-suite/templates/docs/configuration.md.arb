@@ -1,0 +1,28 @@
+# Configuration
+
+arb v1 keeps configuration minimal:
+- package directory (schema + templates)
+- `data.yaml`
+- CLI arguments
+
+## Common CLI options
+
+- `--package <name-or-path>` package name or explicit path
+- `--data <file>` input YAML data
+- `--out <dir>` output directory
+- `--verbose` more diagnostics
+- `--quiet` suppress non-error output
+
+## Package resolution
+
+arb resolves packages in this order:
+1) `./packages/<name>/` relative to your project directory
+2) user-local package cache
+3) explicit path passed to `--package`
+
+## Conventions
+
+- Include-only templates should start with `_` to avoid emitting files.
+  Example: `templates/partials/_header.arb`
+
+- Assets (non-`.arb`) under `templates/` are copied verbatim to output.

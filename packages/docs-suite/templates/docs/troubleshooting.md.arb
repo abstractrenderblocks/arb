@@ -1,0 +1,16 @@
+# Troubleshooting
+
+{rep}sections.troubleshooting
+## Symptom
+
+{var}symptom{/var}
+
+### Likely cause
+
+{var}cause{/var}
+
+### Fix
+
+{var}fix{/var}
+
+{/rep}
