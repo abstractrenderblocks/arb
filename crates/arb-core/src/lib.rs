@@ -110,6 +110,16 @@ pub fn compile_command(
             continue;
         }
 
+        let file_name = rel
+            .file_name()
+            .and_then(|s| s.to_str())
+            .ok_or_else(|| ArbError::Other("invalid template file name".to_string()))?;
+
+        // Skip “partial” templates (include-only convention)
+        if file_name.starts_with('_') {
+            continue;
+        }
+
         // Render .arb → output without .arb suffix
         let mut out_rel = rel.to_path_buf();
 
@@ -128,7 +138,8 @@ pub fn compile_command(
         }
 
         let text = std::fs::read_to_string(src_path)?;
-        let rendered = template::render_var_if_rep_only(&rel_str, &text, &data)?;
+        let rendered = template::render_var_if_rep_inc(&templates_dir, &rel_str, &text, &data)?;
+
 
         // Enforce output size limit (10 MB default per spec)
         let max_bytes: usize = 10 * 1024 * 1024;

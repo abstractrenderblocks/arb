@@ -9,15 +9,44 @@ use serde_yaml::Value;
 /// - `{if}` blocks may contain nested `{if}` blocks and `{var}` tags.
 /// - `{rep}` blocks may contain other nested blocks
 /// - `{inc}` are NOT supported yet.
-pub fn render_var_if_rep_only(template_path: &str, input: &str, data: &Value) -> Result<String, ArbError> {
-    render_inner(template_path, input, data, 0)
-}
-const MAX_EXPANSION_DEPTH: usize = 128;
 
-fn render_inner(template_path: &str, input: &str, data: &Value, depth: usize) -> Result<String, ArbError> {
+use std::path::Path;
+
+pub fn render_var_if_rep_inc(
+    templates_root: &Path,
+    template_rel: &str,
+    input: &str,
+    data: &Value,
+) -> Result<String, ArbError> {
+    let mut stack: Vec<String> = vec![template_rel.to_string()];
+    render_inner(templates_root, template_rel, input, data, 0, &mut stack)
+}
+
+
+const MAX_EXPANSION_DEPTH: usize = 128;
+const MAX_INCLUDE_DEPTH: usize = 32;
+
+fn render_inner(
+    templates_root: &std::path::Path,
+    template_rel: &str,
+    input: &str,
+    data: &Value,
+    depth: usize,
+    include_stack: &mut Vec<String>,
+) -> Result<String, ArbError> {
+
     if depth > MAX_EXPANSION_DEPTH {
         return Err(template_err(
-            template_path,
+            template_rel,
+            input,
+            0,
+            format!("expansion depth limit exceeded (>{MAX_EXPANSION_DEPTH})"),
+        ));
+    }
+
+    if depth > MAX_EXPANSION_DEPTH {
+        return Err(template_err(
+            template_rel,
             input,
             0,
             format!("expansion depth limit exceeded (>{MAX_EXPANSION_DEPTH})"),
@@ -35,17 +64,17 @@ fn render_inner(template_path: &str, input: &str, data: &Value, depth: usize) ->
             i += 5;
 
             let close = find_subslice(bytes, i, b"{/var}")
-                .ok_or_else(|| template_err(template_path, input, tag_start, "missing closing {/var}".to_string()))?;
+                .ok_or_else(|| template_err(template_rel, input, tag_start, "missing closing {/var}".to_string()))?;
 
             let raw_path = &input[i..close];
             let path = raw_path.trim();
             if path.is_empty() {
-                return Err(template_err(template_path, input, tag_start, "empty {var} path".to_string()));
+                return Err(template_err(template_rel, input, tag_start, "empty {var} path".to_string()));
             }
 
             let v = resolve_path(data, path).ok_or_else(|| {
                 template_err(
-                    template_path,
+                    template_rel,
                     input,
                     tag_start,
                     format!("missing value at path '{path}'"),
@@ -75,7 +104,7 @@ fn render_inner(template_path: &str, input: &str, data: &Value, depth: usize) ->
             let path = input[path_start..i].trim();
 
             if path.is_empty() {
-                return Err(template_err(template_path, input, tag_start, "empty {rep} path".to_string()));
+                return Err(template_err(template_rel, input, tag_start, "empty {rep} path".to_string()));
             }
 
             // Consume optional single newline after the path for readability
@@ -94,7 +123,7 @@ fn render_inner(template_path: &str, input: &str, data: &Value, depth: usize) ->
 
             // Find matching {/rep}, allowing nested {rep}...{/rep}
             let (body_end, close_end) = find_matching_rep_close(bytes, i).ok_or_else(|| {
-                template_err(template_path, input, tag_start, "missing closing {/rep}".to_string())
+                template_err(template_rel, input, tag_start, "missing closing {/rep}".to_string())
             })?;
 
             let body = &input[i..body_end];
@@ -102,7 +131,7 @@ fn render_inner(template_path: &str, input: &str, data: &Value, depth: usize) ->
             // Per spec: invalid paths are errors for {rep}
             let v = resolve_path(data, path).ok_or_else(|| {
                 template_err(
-                    template_path,
+                    template_rel,
                     input,
                     tag_start,
                     format!("missing value at path '{path}'"),
@@ -111,7 +140,7 @@ fn render_inner(template_path: &str, input: &str, data: &Value, depth: usize) ->
 
             let seq = v.as_sequence().ok_or_else(|| {
                 template_err(
-                    template_path,
+                    template_rel,
                     input,
                     tag_start,
                     format!("expected list at path '{path}'"),
@@ -120,11 +149,77 @@ fn render_inner(template_path: &str, input: &str, data: &Value, depth: usize) ->
 
             for item in seq {
                 // Context becomes the list item during each iteration
-                let rendered_body = render_inner(template_path, body, item, depth + 1)?;
+                let rendered_body = render_inner(
+                    templates_root,
+                    template_rel,
+                    body,
+                    item,
+                    depth + 1,
+                    include_stack,
+                )?;
                 out.push_str(&rendered_body);
             }
 
             i = close_end;
+            continue;
+        }
+
+        // {inc}
+        if starts_with(bytes, i, b"{inc}") {
+            let tag_start = i;
+            i += 5; // after "{inc}"
+
+            let close = find_subslice(bytes, i, b"{/inc}")
+                .ok_or_else(|| template_err(template_rel, input, tag_start, "missing closing {/inc}".to_string()))?;
+
+            let raw_path = input[i..close].trim();
+            if raw_path.is_empty() {
+                return Err(template_err(template_rel, input, tag_start, "empty {inc} path".to_string()));
+            }
+
+            // Resolve include path relative to current template
+            let (inc_rel, inc_abs) = resolve_include_path(templates_root, template_rel, raw_path)
+                .map_err(|msg| template_err(template_rel, input, tag_start, msg))?;
+
+            // Cycle detection
+            if include_stack.iter().any(|p| p == &inc_rel) {
+                let mut chain = include_stack.clone();
+                chain.push(inc_rel.clone());
+                return Err(template_err(
+                    template_rel,
+                    input,
+                    tag_start,
+                    format!("include cycle detected: {}", chain.join(" -> ")),
+                ));
+            }
+
+            // Include depth limit
+            if include_stack.len() >= MAX_INCLUDE_DEPTH {
+                return Err(template_err(
+                    template_rel,
+                    input,
+                    tag_start,
+                    format!("include depth limit exceeded (>{MAX_INCLUDE_DEPTH})"),
+                ));
+            }
+
+            let inc_text = std::fs::read_to_string(&inc_abs)
+                .map_err(|e| template_err(template_rel, input, tag_start, format!("include read failed: {e}")))?;
+
+            // Render included template with the SAME current context (`data`)
+            include_stack.push(inc_rel.clone());
+            let rendered_inc = render_inner(
+                templates_root,
+                &inc_rel,
+                &inc_text,
+                data,
+                depth + 1,
+                include_stack,
+            )?;
+            include_stack.pop();
+
+            out.push_str(&rendered_inc);
+            i = close + 6; // after "{/inc}"
             continue;
         }
 
@@ -146,7 +241,7 @@ fn render_inner(template_path: &str, input: &str, data: &Value, depth: usize) ->
             let path = input[path_start..i].trim();
 
             if path.is_empty() {
-                return Err(template_err(template_path, input, tag_start, "empty {if} path".to_string()));
+                return Err(template_err(template_rel, input, tag_start, "empty {if} path".to_string()));
             }
 
             // Consume optional single newline after the path for readability
@@ -166,7 +261,7 @@ fn render_inner(template_path: &str, input: &str, data: &Value, depth: usize) ->
 
             // Find matching {/if}, allowing nested {if} ... {/if}
             let (body_end, close_end) = find_matching_if_close(bytes, i).ok_or_else(|| {
-                template_err(template_path, input, tag_start, "missing closing {/if}".to_string())
+                template_err(template_rel, input, tag_start, "missing closing {/if}".to_string())
             })?;
 
             let body = &input[i..body_end];
@@ -177,7 +272,14 @@ fn render_inner(template_path: &str, input: &str, data: &Value, depth: usize) ->
             };
 
             if cond {
-                let rendered_body = render_inner(template_path, body, data, depth + 1)?;
+                let rendered_body = render_inner(
+                    templates_root,
+                    template_rel,
+                    body,
+                    data,
+                    depth + 1,
+                    include_stack,
+                )?;
                 out.push_str(&rendered_body);
             }
 
@@ -264,10 +366,14 @@ fn find_subslice(hay: &[u8], from: usize, needle: &[u8]) -> Option<usize> {
         .map(|p| from + p)
 }
 
-/// Resolve a dot path into YAML Value.
-/// Supported (for now):
-/// - `foo.bar` mapping traversal
-/// - `.` for root
+/// Resolve a dot path into a YAML Value, relative to the current context.
+/// Supported in v1:
+/// - `foo.bar` mapping traversal (string keys only)
+/// - `.` returns the current context value
+///
+/// Note:
+/// - Outside `{rep}`, the current context is the root data document.
+/// - Inside `{rep}`, the current context is the current list item.
 fn resolve_path<'a>(root: &'a Value, path: &str) -> Option<&'a Value> {
     if path == "." {
         return Some(root);
@@ -288,6 +394,73 @@ fn resolve_path<'a>(root: &'a Value, path: &str) -> Option<&'a Value> {
     }
     Some(cur)
 }
+
+use std::path::{PathBuf, Component};
+
+fn resolve_include_path(
+    templates_root: &Path,
+    current_template_rel: &str,
+    include_str: &str,
+) -> Result<(String, PathBuf), String> {
+    if include_str.contains('\\') {
+        return Err("include paths must use '/' separators".to_string());
+    }
+    if include_str.starts_with('/') || include_str.contains(':') {
+        return Err("include path must be relative".to_string());
+    }
+    if !include_str.ends_with(".arb") {
+        return Err("include target must be a .arb template".to_string());
+    }
+
+    let cur_rel = Path::new(current_template_rel);
+    let base_dir = cur_rel.parent().unwrap_or_else(|| Path::new(""));
+
+    // Normalize: base_dir + include_str, preventing escape above templates/
+    let mut parts: Vec<String> = Vec::new();
+
+    for c in base_dir.components() {
+        match c {
+            Component::Normal(os) => parts.push(os.to_string_lossy().to_string()),
+            Component::CurDir => {}
+            Component::ParentDir => {
+                if parts.pop().is_none() {
+                    return Err("include resolution attempted to escape templates/".to_string());
+                }
+            }
+            _ => return Err("invalid template base path".to_string()),
+        }
+    }
+
+    for seg in include_str.split('/') {
+        if seg.is_empty() || seg == "." {
+            continue;
+        }
+        if seg == ".." {
+            if parts.pop().is_none() {
+                return Err("include resolution attempted to escape templates/".to_string());
+            }
+            continue;
+        }
+        if seg.contains('{') || seg.contains('}') {
+            return Err("include path must be literal (no tags)".to_string());
+        }
+        parts.push(seg.to_string());
+    }
+
+    let rel = parts.join("/");
+    let abs = templates_root.join(Path::new(&rel));
+
+    // Must remain under templates_root (best-effort without canonicalize)
+    if !abs.starts_with(templates_root) {
+        return Err("include resolution escaped templates/".to_string());
+    }
+    if !abs.is_file() {
+        return Err(format!("include file not found: {rel}"));
+    }
+
+    Ok((rel, abs))
+}
+
 
 fn is_truthy(v: &Value) -> bool {
     match v {
