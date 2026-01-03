@@ -7,11 +7,11 @@ use serde_yaml::Value;
 ///
 /// Notes:
 /// - `{if}` blocks may contain nested `{if}` blocks and `{var}` tags.
-/// - `{rep}` and `{inc}` are NOT supported yet.
-pub fn render_var_if_only(template_path: &str, input: &str, data: &Value) -> Result<String, ArbError> {
+/// - `{rep}` blocks may contain other nested blocks
+/// - `{inc}` are NOT supported yet.
+pub fn render_var_if_rep_only(template_path: &str, input: &str, data: &Value) -> Result<String, ArbError> {
     render_inner(template_path, input, data, 0)
 }
-
 const MAX_EXPANSION_DEPTH: usize = 128;
 
 fn render_inner(template_path: &str, input: &str, data: &Value, depth: usize) -> Result<String, ArbError> {
@@ -54,6 +54,77 @@ fn render_inner(template_path: &str, input: &str, data: &Value, depth: usize) ->
 
             out.push_str(&stringify_value(v));
             i = close + 6;
+            continue;
+        }
+
+        // {rep}
+        if starts_with(bytes, i, b"{rep}") {
+            let tag_start = i;
+            i += 5;
+
+            // Skip whitespace after {rep}
+            while i < bytes.len() && is_ws(bytes[i]) {
+                i += 1;
+            }
+
+            // Read path token until whitespace
+            let path_start = i;
+            while i < bytes.len() && !is_ws(bytes[i]) {
+                i += 1;
+            }
+            let path = input[path_start..i].trim();
+
+            if path.is_empty() {
+                return Err(template_err(template_path, input, tag_start, "empty {rep} path".to_string()));
+            }
+
+            // Consume optional single newline after the path for readability
+            if i < bytes.len() && bytes[i] == b'\r' {
+                i += 1;
+                if i < bytes.len() && bytes[i] == b'\n' {
+                    i += 1;
+                }
+            } else if i < bytes.len() && bytes[i] == b'\n' {
+                i += 1;
+            } else {
+                while i < bytes.len() && (bytes[i] == b' ' || bytes[i] == b'\t') {
+                    i += 1;
+                }
+            }
+
+            // Find matching {/rep}, allowing nested {rep}...{/rep}
+            let (body_end, close_end) = find_matching_rep_close(bytes, i).ok_or_else(|| {
+                template_err(template_path, input, tag_start, "missing closing {/rep}".to_string())
+            })?;
+
+            let body = &input[i..body_end];
+
+            // Per spec: invalid paths are errors for {rep}
+            let v = resolve_path(data, path).ok_or_else(|| {
+                template_err(
+                    template_path,
+                    input,
+                    tag_start,
+                    format!("missing value at path '{path}'"),
+                )
+            })?;
+
+            let seq = v.as_sequence().ok_or_else(|| {
+                template_err(
+                    template_path,
+                    input,
+                    tag_start,
+                    format!("expected list at path '{path}'"),
+                )
+            })?;
+
+            for item in seq {
+                // Context becomes the list item during each iteration
+                let rendered_body = render_inner(template_path, body, item, depth + 1)?;
+                out.push_str(&rendered_body);
+            }
+
+            i = close_end;
             continue;
         }
 
@@ -147,6 +218,34 @@ fn find_matching_if_close(hay: &[u8], from: usize) -> Option<(usize, usize)> {
                 return Some((body_end, close_end));
             }
             i += 5;
+            continue;
+        }
+        i += 1;
+    }
+    None
+}
+
+/// Finds the matching {/rep} for a block starting at `from` (the body start),
+/// supporting nested {rep} ... {/rep}.
+/// Returns (body_end_index, index_after_close_tag).
+fn find_matching_rep_close(hay: &[u8], from: usize) -> Option<(usize, usize)> {
+    let mut i = from;
+    let mut depth: usize = 1;
+
+    while i < hay.len() {
+        if starts_with(hay, i, b"{rep}") {
+            depth += 1;
+            i += 5;
+            continue;
+        }
+        if starts_with(hay, i, b"{/rep}") {
+            depth -= 1;
+            if depth == 0 {
+                let body_end = i;
+                let close_end = i + 6; // after "{/rep}"
+                return Some((body_end, close_end));
+            }
+            i += 6;
             continue;
         }
         i += 1;
