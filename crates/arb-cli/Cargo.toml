@@ -1,0 +1,11 @@
+[package]
+name = "arb-cli"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "arb"
+path = "src/main.rs"
+
+[dependencies]
+arb-core = { path = "../arb-core" }
