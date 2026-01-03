@@ -88,8 +88,14 @@ All outputs are generated from one source of truth.
 ### 1. Install
 
 ```cmd
-cargo install arb-cli
+### Install (from source)
+
+```cmd
+git clone https://github.com/AbstractRenderBlocks/arb.git
+cd arb
+cargo install --path crates/arb-cli
 ```
+> `arb-cli` will be published to crates.io once the v0.1 release is tagged.
 
 ### 2. Create a project directory
 
