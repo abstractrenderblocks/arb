@@ -1,0 +1,51 @@
+type: object
+required: [tool, config, required_keys]
+properties:
+  tool:
+    type: object
+    required: [name, version, license, description]
+    properties:
+      name: { type: string }
+      version: { type: string }
+      license: { type: string }
+      description: { type: string }
+
+  # Precomputed list so templates don't need logic to build it
+  required_keys:
+    type: list
+    items:
+      type: object
+      required: [value, suffix]
+      properties:
+        value: { type: string }
+        suffix: { type: string }   # "," or ""
+
+  config:
+    type: list
+    items:
+      type: object
+      required: [key, json_type, description, example, suffix]
+      properties:
+        key: { type: string }
+
+        # JSON Schema types: string | integer | number | boolean
+        json_type: { type: string }
+
+        description: { type: string }
+
+        # Used for config.example.yaml (human-friendly)
+        example: { type: string }
+
+        # Optional default (as JSON token)
+        default_json:
+          type: string
+
+        # Optional enum values (strings)
+        enum:
+          type: list
+          items:
+            type: object
+            required: [value, suffix]
+            properties:
+              value: { type: string }
+              suffix: { type: string }  # "," or ""

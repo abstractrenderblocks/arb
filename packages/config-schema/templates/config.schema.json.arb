@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "{var}tool.name{/var}",
+  "description": "{var}tool.description{/var}",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+{rep}config
+    "{var}key{/var}": {
+      "type": "{var}json_type{/var}",
+      "description": "{var}description{/var}"
+{if}default_json
+      ,"default": {var}default_json{/var}
+{/if}
+{if}enum
+      ,"enum": [
+{rep}enum
+        "{var}value{/var}"{var}suffix{/var}
+{/rep}
+      ]
+{/if}
+    }{var}suffix{/var}
+{/rep}
+  },
+  "required": [
+{rep}required_keys
+    "{var}value{/var}"{var}suffix{/var}
+{/rep}
+  ]
+}
+\

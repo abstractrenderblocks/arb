@@ -1,0 +1,60 @@
+tool:
+  name: config-schema
+  version: 0.1.0
+  license: MIT
+  description: Generate example config, docs, and JSON Schema from one config definition.
+
+
+# Precomputed required list (arb v1 has no accumulation)
+required_keys:
+  - value: api_key
+    suffix: ""
+
+config:
+  - key: data_dir
+    json_type: string
+    description: Directory where application data is stored.
+    example: ./data
+    default_json: '"./data"'
+    required: false
+    suffix: ","
+
+  - key: log_level
+    json_type: string
+    description: Logging verbosity.
+    enum:
+      - value: error
+        suffix: ","
+      - value: warn
+        suffix: ","
+      - value: info
+        suffix: ","
+      - value: debug
+        suffix: ""
+    example: info
+    default_json: '"info"'
+    required: false
+    suffix: ","
+
+  - key: port
+    json_type: integer
+    description: Port to bind the server.
+    example: "8080"
+    default_json: "8080"
+    required: false
+    suffix: ","
+
+  - key: dry_run
+    json_type: boolean
+    description: If true, perform a trial run without making changes.
+    example: "false"
+    default_json: "false"
+    required: false
+    suffix: ","
+
+  - key: api_key
+    json_type: string
+    description: API key used to authenticate requests.
+    example: "REPLACE_ME"
+    required: true
+    suffix: ""
