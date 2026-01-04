@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand, Args};
+use clap::{Args, Parser, Subcommand};
 
 #[derive(Parser, Debug)]
 #[command(
@@ -16,11 +16,14 @@ struct Cli {
 
 {if}global_options
 {rep}global_options
-    #[arg({if}short short='{var}short{/var}', {/if}long="{var}long{/var}"
+    #[arg(
+        {if}short short='{var}short{/var}', {/if}
+        long="{var}long{/var}"
 {if}default
         , default_value="{var}default{/var}"
 {/if}
-        , help="{var}help{/var}")]
+        , help="{var}help{/var}"
+    )]
 {if}required
     {var}ident{/var}: {var}type{/var},
 {/if}
@@ -37,344 +40,19 @@ struct Cli {
 #[derive(Subcommand, Debug)]
 enum Commands {
 {rep}commands
-{if}subcommands
-    /// {var}summary{/var}
-    {var}ident{/var}({var}ident{/var}Cmd),
-{/if}
-{if}args
-
-    /// {var}summary{/var}
-    {var}ident{/var}({var}ident{/var}Args),
-{/if}
-{if}flags
-
-    /// {var}summary{/var}
-    {var}ident{/var}({var}ident{/var}Args),
-{/if}
-{if}options
-    /// {var}summary{/var}
-    {var}ident{/var}({var}ident{/var}Args),
-{/if}
-{if}examples
-    /// {var}summary{/var}
-    {var}ident{/var}({var}ident{/var}Args),
-{/if}
-{if}name
-
-{/if}
-{/rep}
-}
-
-
-{rep}commands
-{if}subcommands
-
-{/if}
-{if}subcommands
-
-{/if}
-{if}subcommands
-
-{/if}
-{if}subcommands
-
-{/if}
-{if}subcommands
-
-{/if}
-{if}subcommands
-
-{/if}
-{if}subcommands
-
-{/if}
-{if}subcommands
-
-{/if}
-{if}subcommands
-
-{/if}
-{if}subcommands
-
-{/if}
-{if}subcommands
-
-{/if}
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-
-{if}subcommands
-
-{/if}
-{if}subcommands
-
-{/if}
-{/rep}
-
-
-{rep}commands
-{if}subcommands
-
-{/if}
-{if}subcommands
-
-{/if}
-{if}subcommands
-
-{/if}
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-{if}subcommands
-
-{/if}
-
-
-{if}subcommands
-
-{/if}
-{if}subcommands
-
-{/if}
-{/rep}
-
-
-{rep}commands
-{if}subcommands
-#[derive(Args, Debug)]
-struct {var}ident{/var}Cmd {
-    #[command(subcommand)]
-    subcommand: {var}ident{/var}Subcommand,
-}
-
-#[derive(Subcommand, Debug)]
-enum {var}ident{/var}Subcommand {
-{rep}subcommands
     /// {var}summary{/var}
     {var}ident{/var}({var}ident{/var}Args),
 {/rep}
 }
 
-{rep}subcommands
+{rep}commands
 #[derive(Args, Debug)]
 struct {var}ident{/var}Args {
+{if}subcommands
+    #[command(subcommand)]
+    subcommand: {var}ident{/var}Subcommand,
+{/if}
+
 {if}flags
 {rep}flags
     #[arg({if}short short='{var}short{/var}', {/if}long="{var}long{/var}", help="{var}help{/var}")]
@@ -384,11 +62,60 @@ struct {var}ident{/var}Args {
 
 {if}options
 {rep}options
-    #[arg({if}short short='{var}short{/var}', {/if}long="{var}long{/var}"
+    #[arg(
+        {if}short short='{var}short{/var}', {/if}
+        long="{var}long{/var}"
 {if}default
         , default_value="{var}default{/var}"
 {/if}
-        , help="{var}help{/var}")]
+        , help="{var}help{/var}"
+    )]
+{if}required
+    {var}ident{/var}: {var}type{/var},
+{/if}
+{if}optional
+    {var}ident{/var}: Option<{var}type{/var}>,
+{/if}
+{/rep}
+{/if}
+
+{if}args
+{rep}args
+    #[arg(value_name="{var}name{/var}", help="{var}help{/var}")]
+    {var}ident{/var}: String,
+{/rep}
+{/if}
+}
+
+{if}subcommands
+#[derive(Subcommand, Debug)]
+enum {var}ident{/var}Subcommand {
+{rep}subcommands
+    /// {var}summary{/var}
+    {var}ident{/var}({var}ident{/var}SubArgs),
+{/rep}
+}
+
+{rep}subcommands
+#[derive(Args, Debug)]
+struct {var}ident{/var}SubArgs {
+{if}flags
+{rep}flags
+    #[arg({if}short short='{var}short{/var}', {/if}long="{var}long{/var}", help="{var}help{/var}")]
+    {var}ident{/var}: bool,
+{/rep}
+{/if}
+
+{if}options
+{rep}options
+    #[arg(
+        {if}short short='{var}short{/var}', {/if}
+        long="{var}long{/var}"
+{if}default
+        , default_value="{var}default{/var}"
+{/if}
+        , help="{var}help{/var}"
+    )]
 {if}required
     {var}ident{/var}: {var}type{/var},
 {/if}
@@ -406,8 +133,8 @@ struct {var}ident{/var}Args {
 {/if}
 }
 {/rep}
-
 {/if}
+
 {/rep}
 
 fn main() {
@@ -416,21 +143,23 @@ fn main() {
     match cli.command {
 {rep}commands
 {if}subcommands
-        Commands::{var}ident{/var}(cmd) => {
+        Commands::{var}ident{/var}(_args) => {
             use {var}ident{/var}Subcommand::*;
-            match cmd.subcommand {
+            match _args.subcommand {
 {rep}subcommands
-                {var}ident{/var}(_args) => {
-                    // TODO: implement nested subcommand
+                {var}ident{/var}(_sub_args) => {
                     println!("{var}name{/var}: TODO");
                 }
 {/rep}
             }
-        },
+        }
 {/if}
-{if}subcommands
-
+{if}no_subcommands
+        Commands::{var}ident{/var}(_args) => {
+            println!("{var}name{/var}: TODO");
+        }
 {/if}
 {/rep}
     }
 }
+

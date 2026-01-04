@@ -53,6 +53,8 @@ properties:
         name: { type: string }
         ident: { type: string }
         summary: { type: string }
+        has_subcommands: { type: boolean }
+        no_subcommands: { type: boolean }
 
         args:
           type: list

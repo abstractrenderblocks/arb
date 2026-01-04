@@ -15,11 +15,12 @@ global_flags:
 commands:
   - name: remote
     ident: Remote
-    summary: Manage remote endpoints.
+    has_subcommands: true
+    summary: Manage remote endpoints
     subcommands:
       - name: add
         ident: Add
-        summary: Add a remote.
+        summary: Add a remote
         args:
           - name: NAME
             ident: name
@@ -29,8 +30,9 @@ commands:
             help: Remote URL
       - name: list
         ident: List
-        summary: List remotes.
+        summary: List remotes
 
   - name: status
     ident: Status
-    summary: Show current status.
+    no_subcommands: true
+    summary: Show current status
