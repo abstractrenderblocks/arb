@@ -1,0 +1,43 @@
+# cli-rust
+
+This package demonstrates how **arb** can generate a real Rust CLI using
+[clap](https://github.com/clap-rs/clap).
+
+It is intentionally small but non-trivial, and shows:
+
+- global flags
+- leaf commands
+- nested subcommands (`remote add`, `remote list`)
+- correct help output at every level
+
+All CLI structure is defined in data, not handwritten Rust.
+
+## How it works
+
+- `schema.yaml` defines the allowed CLI shape
+- `examples/data.nested.yaml` describes a CLI with nested subcommands
+- `templates/` contains the code templates used to generate the CLI
+
+Running `arb compile` produces a fully working Rust CLI project.
+
+## Try it
+
+From the repo root:
+
+```cmd
+arb compile --package packages/cli-rust ^
+  --data packages/cli-rust/examples/data.nested.yaml ^
+  --out out
+
+cd out
+cargo run -- --help
+cargo run -- status --help
+cargo run -- remote add foo https://example.com
+```
+
+## Why this exists
+
+This example exists to show that arb can generate **real, idiomatic CLIs**
+without hand-written glue code, while keeping validation and determinism.
+
+It is meant as a learning and reference package.

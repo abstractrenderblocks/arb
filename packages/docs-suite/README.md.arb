@@ -1,0 +1,42 @@
+# cli-docs
+
+This package demonstrates how **arb** can generate human-readable documentation
+directly from the same schema and data used for code generation.
+
+It shows how command definitions become:
+
+- structured Markdown documentation
+- consistent command listings
+- example sections derived from data
+- man-page style references
+
+No hand-written docs are required once the schema and data are defined.
+
+## How it works
+
+- `schema.yaml` defines the allowed documentation structure
+- command and example metadata come from the same data used for code generation
+- `templates/` contains Markdown and man-page templates
+
+The output stays consistent with the generated CLI by construction.
+
+## Try it
+
+From the repo root:
+
+```cmd
+arb compile --package packages/cli-docs ^
+  --data packages/cli-rust/examples/data.nested.yaml ^
+  --out out-docs
+```
+
+The output will include generated Markdown documentation and a man page.
+
+## Why this exists
+
+Documentation usually drifts out of sync with code.
+
+This package demonstrates how arb treats documentation as another deterministic
+output of the same source of truth, instead of a separate manual process.
+
+It is meant as a learning and reference package.
