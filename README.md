@@ -141,6 +141,23 @@ support for:
 
 All outputs are generated from one source of truth, ensuring release communication stays accurate, consistent, and repeatable.
 
+### 📦 web-site
+
+The **web-site** package generates a complete static documentation website using Abstract Render Blocks.
+
+It demonstrates that ARB can be used not only to generate code or configuration, but also to generate real, shippable artifacts like websites and documentation — including ARB’s own site.
+
+Using a single validated `data.yaml` file, this package produces:
+
+- A home page describing ARB’s purpose and philosophy
+- A “How It Works” page explaining the execution model
+- A full “Building Packages” authoring guide
+- A packages inventory page
+- Supporting static assets
+
+This package serves as a canonical example of ARB’s power:  
+the same tool, schema discipline, and templates are used to build the program, its documentation, and its website.
+
 ---
 
 ## Try it in 60 seconds

@@ -1,0 +1,446 @@
+site:
+  name: Abstract Render Blocks
+  domain: abstractrenderblocks.com
+  tagline: Deterministic rendering from structured data.
+  repository: https://github.com/abstractrenderblocks/arb
+
+navigation:
+  - href: index.html
+    label: Home
+  - href: how-it-works.html
+    label: How It Works
+  - href: building-packages.html
+    label: Building Packages
+  - href: packages.html
+    label: Packages
+
+index:
+  title: Abstract Render Blocks
+  intro: |
+    Abstract Render Blocks (ARB) is a deterministic rendering tool that turns validated YAML data
+    into concrete output files using simple templates.
+
+  design_goals: |
+    ARB exists to make output generation predictable and repeatable:
+    same inputs, same outputs.
+
+    If the input does not match the contract, it should fail loudly.
+
+  determinism: |
+    ARB keeps logic out of templates.
+    Templates should be boring: substitute values, repeat lists, gate optional blocks.
+
+    If you need complex branching, redesign schema/data so output remains deterministic.
+
+  not: |
+    ARB is not a general-purpose template engine.
+    It does not guess, infer, or mutate your data.
+    It does not "helpfully" coerce types.
+    If something is missing or ambiguous, it should fail.
+
+how_it_works:
+  title: How It Works
+  sections:
+    - heading: The compilation pipeline
+      body: |
+        ARB follows a fixed, deterministic pipeline. There are no shortcuts and no conditional paths:
+
+        schema.yaml
+          ↓
+        data.yaml
+          ↓
+        schema validation
+          ↓
+        template expansion
+          ↓
+        output files
+
+        Every step must succeed before the next one begins.
+        If any step fails, the entire compile stops.
+
+        This guarantees that output is either correct or does not exist at all.
+
+    - heading: Schema validation comes first
+      body: |
+        Before a single template is rendered, ARB validates the provided data against schema.yaml.
+
+        Validation checks include:
+        - Required fields are present
+        - Types match exactly (string, number, boolean, list, object)
+        - Lists contain the expected item structure
+        - No unknown or undeclared fields are present
+
+        If validation fails, rendering does not begin.
+        There is no partial success and no fallback behavior.
+
+    - heading: Template expansion
+      body: |
+        Once data is validated, templates are expanded using a small, explicit set of directives.
+
+        Templates are plain text files.
+        ARB does not execute code, call functions, or evaluate expressions.
+
+        During expansion:
+        - {var} replaces values from validated data
+        - {rep} repeats blocks for list items
+        - {if} conditionally includes blocks
+        - {inc} inserts partial templates
+
+        The same inputs always produce the same outputs.
+
+    - heading: No hidden logic
+      body: |
+        ARB intentionally keeps logic out of templates.
+
+        Templates should:
+        - Substitute values
+        - Repeat lists
+        - Gate optional content
+
+        Templates should NOT:
+        - Contain business rules
+        - Encode decision trees
+        - Compensate for missing or malformed data
+
+        If a template feels complex, the schema or data model should be redesigned.
+
+    - heading: Failure model (why ARB fails loudly)
+      body: |
+        ARB treats failure as a feature, not an inconvenience.
+
+        Common failure points:
+        - YAML parse errors
+        - Schema validation errors
+        - Missing template value paths
+        - Invalid include paths
+        - Recursive or excessive includes
+
+        When a failure occurs:
+        - No output files are produced
+        - The error message points to the exact location
+        - The compile must be fixed before continuing
+
+        Silent failure and partial output are considered bugs.
+
+    - heading: Determinism as a design constraint
+      body: |
+        Determinism is not a side effect of ARB — it is the core constraint.
+
+        ARB does not:
+        - Guess defaults
+        - Infer schema
+        - Mutate data
+        - Reorder lists
+        - Depend on external state
+
+        Given the same schema, data, and templates,
+        ARB will always produce the same output.
+
+        This makes ARB suitable for documentation generation,
+        code generation, configuration rendering, and other
+        workflows where reproducibility matters.
+
+
+packages:
+  title: Packages
+  intro: >
+    Packages are the point of ARB: a schema contract + templates + example data that compiles immediately.
+    Pick a package, copy its examples, and adjust.
+  items:
+    - name: docs-suite
+      path: packages/docs-suite
+      purpose: >
+        Turns one validated YAML file into a complete documentation set (README + docs pages + supporting files).
+      usage: arb compile --package packages/docs-suite --data packages/docs-suite/examples/data.yaml --out out
+
+    - name: config-schema
+      path: packages/config-schema
+      purpose: >
+        Generates config docs and schema artifacts from a single config definition YAML.
+      usage: arb compile --package packages/config-schema --data packages/config-schema/examples/config.yaml --out out
+
+    - name: web-site
+      path: packages/web-site
+      purpose: >
+        Generates a simple static site from schema + data + templates (this site).
+      usage: arb compile --package packages/web-site --data packages/web-site/examples/data.yaml --out out
+
+    - name: cli-rust
+      path: packages/cli-rust
+      purpose: >
+        Generates a Rust CLI skeleton (commands, help, structure) from one YAML source of truth.
+      usage: arb compile --package packages/cli-rust --data packages/cli-rust/examples/data.yaml --out out
+
+    - name: release-notes
+      path: packages/release-notes
+      purpose: >
+        Generates release notes / changelog-style outputs from structured entries.
+      usage: arb compile --package packages/release-notes --data packages/release-notes/examples/data.yaml --out out
+
+
+building_packages:
+  title: Building Packages (Real Guide)
+  sections:
+    - heading: What a package really is
+      body: |
+        A package is three things, and only three things:
+
+        1) schema.yaml
+           - The contract.
+           - Defines the allowed shape and required fields.
+
+        2) data.yaml (or any YAML you pass via --data)
+           - Must match schema.yaml exactly.
+           - If required fields are missing or types don’t match, compile must fail.
+
+        3) templates/
+           - Plain text files with ARB tokens.
+           - The compiler replaces tokens and expands repeats.
+
+        If it “kind of works” but isn’t strict, you’ll ship broken generators. ARB’s value is that it refuses to do that.
+
+    - heading: Canonical package layout
+      body: |
+        This is the layout you should default to:
+
+        packages/my-package/
+          schema.yaml
+          templates/
+            output-1.md.arb
+            output-2.txt.arb
+            partials/
+              _header.md.arb
+              _footer.md.arb
+          examples/
+            data.yaml
+
+        Notes:
+        - examples/data.yaml must compile successfully. Always.
+        - Partial files should start with "_" and live under templates/partials/.
+        - If a file is meant to be compiled into output, it should NOT start with "_".
+
+    - heading: Schema rules (what is allowed)
+      body: |
+        These are the only schema types you should use:
+
+        - object
+        - string
+        - number
+        - boolean
+        - list
+
+        Key patterns:
+
+        1) Object:
+           type: object
+           required: [a, b]
+           properties:
+             a: { type: string }
+             b: { type: number }
+
+        2) List of objects:
+           type: list
+           items:
+             type: object
+             required: [...]
+             properties: ...
+
+        3) Nested objects:
+           Define objects inside properties to keep structure explicit.
+
+        If you try to use JSON-Schema vocabulary (“array”, “oneOf”, etc.), ARB will reject it.
+
+    - heading: Schema rules (what is NOT allowed / common mistakes)
+      body: |
+        Common errors that waste time:
+
+        - Using "array" instead of "list"
+        - Forgetting required fields (then templates reference missing paths)
+        - Designing schema too loose (optional fields everywhere, then outputs drift)
+        - Stuffing formatting into schema instead of data/templates
+
+        Rule of thumb:
+        If output correctness depends on a field, make it required.
+
+    - heading: End-to-end example (simple, realistic)
+      body: |
+        Goal: generate one README.md with a title, tagline, and a repeated list of commands.
+
+        1) schema.yaml:
+
+        type: object
+        required: [project, commands]
+        properties:
+          project:
+            type: object
+            required: [name, tagline]
+            properties:
+              name: { type: string }
+              tagline: { type: string }
+          commands:
+            type: list
+            items:
+              type: object
+              required: [cmd, desc]
+              properties:
+                cmd: { type: string }
+                desc: { type: string }
+
+        2) examples/data.yaml:
+
+        project:
+          name: My Tool
+          tagline: Deterministic generation, no surprises.
+        commands:
+          - cmd: mytool init
+            desc: Initialize a workspace
+          - cmd: mytool build
+            desc: Generate outputs
+
+        3) templates/README.md.arb:
+
+        # {var}project.name{/var}
+
+        {var}project.tagline{/var}
+
+        ## Commands
+        {rep}commands
+        - `{var}cmd{/var}` — {var}desc{/var}
+        {/rep}
+
+        4) compile:
+
+        arb compile --package packages/my-package --data packages/my-package/examples/data.yaml --out out
+
+        Output: out/README.md
+
+        That’s the complete loop: schema → data → template → output.
+
+    - heading: Template tokens (reference)
+      body: |
+        ARB templates support a small set of directives:
+
+        1) Variable substitution
+           {var}path.to.value{/var}
+
+        2) Conditional blocks
+           {if}path.to.value
+             ...rendered if present/truthy...
+           {/if}
+
+        3) Repetition over lists
+           {rep}list.path
+             ...inside, {var}field{/var} refers to each item...
+           {/rep}
+
+        4) Includes (partials)
+           {inc}relative/path/to/template.arb{/inc}
+
+           Notes:
+           - Include target must be a literal string and must end with .arb
+           - Include resolution is relative to the current template
+           - Include cannot escape templates/
+           - Files starting with "_" are skipped as outputs (include-only convention)
+
+
+    - heading: Template rules (what you should NOT do)
+      body: |
+        Don’t try to re-create a template engine in ARB.
+
+        Avoid:
+        - Nested “logic” that becomes hard to reason about
+        - Using {if} everywhere instead of making schema strict
+        - Making templates depend on missing/optional data paths
+        - Hiding complexity in partials
+
+        Rule:
+        If you need complex branching, redesign schema + data so the template stays boring.
+
+    - heading: Lists and repeats (designing for {rep})
+      body: |
+        If you want repeated output, model it as a list in schema/data.
+
+        Good:
+        sections:
+          - heading: ...
+            body: ...
+          - heading: ...
+            body: ...
+
+        Then template:
+
+        {rep}sections
+          <h3>{var}heading{/var}</h3>
+          <p>{var}body{/var}</p>
+        {/rep}
+
+        Bad:
+        section_1_title / section_2_title / section_3_title
+        That becomes unmaintainable immediately.
+
+    - heading: Partials (how they actually work in ARB)
+      body: |
+        ARB supports partials via an explicit include directive in the template engine.
+
+        Conventions:
+        - Partial template files start with "_" (example: _nav.html.arb).
+        - Files starting with "_" are skipped as output files by the compiler.
+        - Partials typically live under templates/partials/ for clarity, but this is a convention, not a requirement.
+
+        Including a partial:
+        - Use the include directive:
+
+          {inc}partials/_nav.html.arb{/inc}
+
+        - The include path must be a literal string and must end in ".arb".
+        - Include paths are resolved relative to the current template.
+        - Includes cannot escape the templates/ directory.
+        - Include cycles are detected and rejected by the compiler.
+        - Maximum include depth is limited (to prevent runaway expansion).
+
+        Why partials exist:
+        - Reduce duplication (headers, footers, navigation blocks).
+        - Centralize shared markup or text without re-implementing logic.
+        - Keep output templates readable and consistent.
+
+        What partials are NOT:
+        - A place to hide control flow or logic.
+        - A second template language layered on top of ARB.
+        - A substitute for well-designed schema and data files.
+
+        Practical guidance:
+        - If you need conditionals or repetition inside a partial, drive them with schema/data
+          and use {if} or {rep} inside the partial itself.
+        - If partial usage makes it hard to understand final output by reading templates,
+          the package has probably become too clever.
+
+    - heading: Debugging failures (fast)
+      body: |
+        ARB failures are usually one of these:
+
+        1) YAML parse error
+           - Usually indentation or unescaped ":" in a bad context.
+           - For long bodies and code blocks inside YAML, use "|" not ">".
+
+        2) Schema validation error
+           - Data doesn’t match schema (missing required field, wrong type, wrong structure).
+
+        3) Template missing value path
+           - Template references a path that doesn’t exist in data.
+           - Fix the template path or fix the schema+data to include it.
+
+        Your quickest workflow:
+        - Fix YAML syntax first.
+        - Then fix schema/data mismatches.
+        - Then fix template paths.
+
+    - heading: Package quality checklist (before you ship it)
+      body: |
+        Before calling a package "done":
+
+        - examples/data.yaml compiles cleanly with a single command
+        - templates do not reference undefined paths
+        - schema is strict where output correctness matters
+        - lists are used for repeated structures
+        - partials reduce duplication but do not add hidden logic
+        - output is deterministic (diff stable across runs)

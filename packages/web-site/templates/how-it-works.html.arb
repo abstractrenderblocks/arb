@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>{var}site.name{/var} - {var}how_it_works.title{/var}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>{var}site.name{/var}</h1>
+    <p>{var}site.tagline{/var}</p>
+
+    <nav>
+{rep}navigation
+      <a href="{var}href{/var}">{var}label{/var}</a>
+{/rep}
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <h2>{var}how_it_works.title{/var}</h2>
+
+{rep}how_it_works.sections
+    <section>
+      <h3>{var}heading{/var}</h3>
+      <div class="md">{var}body{/var}</div>
+    </section>
+{/rep}
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>
+      <a href="{var}site.repository{/var}">GitHub</a> - {var}site.domain{/var}
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

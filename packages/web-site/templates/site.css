@@ -1,0 +1,103 @@
+:root {
+  --max: 900px;
+  --pad: 18px;
+  --bg: #0b0d10;
+  --panel: #11151b;
+  --text: #e8eef7;
+  --muted: #a7b3c6;
+  --link: #8ab4ff;
+  --border: rgba(255,255,255,0.10);
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  font: 16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.wrap {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: var(--pad);
+}
+
+header {
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0));
+}
+
+header .wrap { padding-top: 26px; padding-bottom: 18px; }
+
+h1 {
+  margin: 0 0 6px 0;
+  font-size: 28px;
+  letter-spacing: 0.2px;
+}
+
+header p {
+  margin: 0 0 14px 0;
+  color: var(--muted);
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+nav a {
+  display: inline-block;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+}
+
+main .wrap { padding-top: 22px; }
+
+h2 { margin: 0 0 14px 0; font-size: 22px; }
+
+section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 14px 0;
+}
+
+h3 { margin: 0 0 8px 0; font-size: 16px; }
+
+p { margin: 0; }
+footer {
+  border-top: 1px solid var(--border);
+  margin-top: 26px;
+  padding: 18px 0;
+  color: var(--muted);
+}
+
+/* Render YAML block bodies with newlines preserved */
+.md {
+  white-space: pre-wrap;  /* keeps line breaks, wraps long lines */
+}
+
+.md pre {
+  white-space: pre;
+  overflow-x: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+}
+
+.md code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.95em;
+}

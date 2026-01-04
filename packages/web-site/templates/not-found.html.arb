@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>404 - {var}site.name{/var}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>{var}site.name{/var}</h1>
+
+    <nav>
+{rep}navigation
+      <a href="{var}href{/var}">{var}label{/var}</a>
+{/rep}
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <h2>404</h2>
+    <div class="md">Page not found.</div>
+  </div>
+</main>
+
+</body>
+</html>

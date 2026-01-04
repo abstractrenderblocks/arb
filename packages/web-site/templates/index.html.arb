@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>{var}site.name{/var}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>{var}site.name{/var}</h1>
+    <p>{var}site.tagline{/var}</p>
+
+    <nav>
+{rep}navigation
+      <a href="{var}href{/var}">{var}label{/var}</a>
+{/rep}
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <!-- WHAT IT IS -->
+    <section>
+      <h2>{var}index.title{/var}</h2>
+      <div class="md">{var}index.intro{/var}</div>
+    </section>
+
+    <!-- DESIGN GOALS (from Overview) -->
+    <section>
+      <h2>Design goals</h2>
+      <div class="md">{var}index.design_goals{/var}</div>
+    </section>
+
+    <!-- DETERMINISM / PHILOSOPHY (from Overview) -->
+    <section>
+      <h2>Determinism by design</h2>
+      <div class="md">{var}index.determinism{/var}</div>
+    </section>
+
+    <!-- WHAT IT IS NOT -->
+    <section>
+      <h2>What ARB is not</h2>
+      <div class="md">{var}index.not{/var}</div>
+    </section>
+
+    <!-- NEXT STEPS -->
+    <section>
+      <h2>Where to go next</h2>
+      <div class="md">
+        - Read <a href="how-it-works.html">How It Works</a> for the execution model<br>
+        - Read <a href="building-packages.html">Building Packages</a> to actually build something<br>
+        - Browse <a href="packages.html">Packages</a> to see what already exists
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>
+      <a href="{var}site.repository{/var}">GitHub</a> - {var}site.domain{/var}
+    </p>
+    <p>
+      This site generated with arb web-site package. 
+    </p>    
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+type: object
+required:
+  - site
+  - navigation
+  - index
+  - how_it_works
+  - building_packages
+  - packages
+
+properties:
+  site:
+    type: object
+    required: [name, domain, tagline, repository]
+    properties:
+      name: { type: string }
+      domain: { type: string }
+      tagline: { type: string }
+      repository: { type: string }
+
+  navigation:
+    type: list
+    items:
+      type: object
+      required: [href, label]
+      properties:
+        href: { type: string }
+        label: { type: string }
+
+  index:
+    type: object
+    required: [title, intro, design_goals, determinism, not]
+    properties:
+      title: { type: string }
+      intro: { type: string }
+      design_goals: { type: string }
+      determinism: { type: string }
+      not: { type: string }
+
+  how_it_works:
+    type: object
+    required: [title, sections]
+    properties:
+      title: { type: string }
+      sections:
+        type: list
+        items:
+          type: object
+          required: [heading, body]
+          properties:
+            heading: { type: string }
+            body: { type: string }
+
+  building_packages:
+    type: object
+    required: [title, sections]
+    properties:
+      title: { type: string }
+      sections:
+        type: list
+        items:
+          type: object
+          required: [heading, body]
+          properties:
+            heading: { type: string }
+            body: { type: string }
+
+  packages:
+    type: object
+    required: [title, intro, items]
+    properties:
+      title: { type: string }
+      intro: { type: string }
+      items:
+        type: list
+        items:
+          type: object
+          required: [name, path, purpose, usage]
+          properties:
+            name: { type: string }
+            path: { type: string }
+            purpose: { type: string }
+            usage: { type: string }
