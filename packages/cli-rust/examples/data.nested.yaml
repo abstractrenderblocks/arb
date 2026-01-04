@@ -1,57 +1,36 @@
 tool:
-  name: "RepoTool"
-  bin: "repotool"
-  version: "0.1.0"
-  license: "Apache-2.0"
-  description: "A tiny CLI that demonstrates nested subcommands (arb cli-rust package)."
-  repo_url: "https://github.com/example/repotool"
+  name: repotool
+  bin: repotool
+  version: 0.1.0
+  license: MIT
+  description: A tiny CLI that demonstrates nested subcommands (arb cli-rust package).
+  repo_url: https://example.invalid
 
 global_flags:
-  - long: "verbose"
-    ident: "verbose"
-    short: "v"
-    help: "Enable verbose logging."
+  - long: verbose
+    ident: verbose
+    help: Enable verbose logging.
+    short: v
 
 commands:
-  - name: "remote"
-    ident: "Remote"
-    summary: "Manage remote endpoints."
+  - name: remote
+    ident: Remote
+    summary: Manage remote endpoints.
     subcommands:
-      - name: "add"
-        ident: "Add"
-        summary: "Add a new remote."
+      - name: add
+        ident: Add
+        summary: Add a remote.
         args:
-          - name: "name"
-            ident: "name"
-            help: "Remote name."
-          - name: "url"
-            ident: "url"
-            help: "Remote URL."
-        flags:
-          - long: "fetch"
-            ident: "fetch"
-            help: "Fetch immediately after adding."
+          - name: NAME
+            ident: name
+            help: Remote name
+          - name: URL
+            ident: url
+            help: Remote URL
+      - name: list
+        ident: List
+        summary: List remotes.
 
-      - name: "remove"
-        ident: "Remove"
-        summary: "Remove an existing remote."
-        args:
-          - name: "name"
-            ident: "name"
-            help: "Remote name."
-
-      - name: "list"
-        ident: "List"
-        summary: "List configured remotes."
-        flags:
-          - long: "verbose"
-            ident: "verbose"
-            help: "Print extended remote info."
-
-  - name: "status"
-    ident: "Status"
-    summary: "Show current status."
-    flags:
-      - long: "json"
-        ident: "json"
-        help: "Emit JSON output."
+  - name: status
+    ident: Status
+    summary: Show current status.

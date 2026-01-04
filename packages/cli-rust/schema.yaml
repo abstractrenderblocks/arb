@@ -95,6 +95,58 @@ properties:
 
               default: { type: string }
 
+        # NEW: nested subcommands (one level)
+        subcommands:
+          type: list
+          items:
+            type: object
+            required: [name, ident, summary]
+            properties:
+              name: { type: string }
+              ident: { type: string }
+              summary: { type: string }
+
+              args:
+                type: list
+                items:
+                  type: object
+                  required: [name, ident, help]
+                  properties:
+                    name: { type: string }
+                    ident: { type: string }
+                    help: { type: string }
+
+              flags:
+                type: list
+                items:
+                  type: object
+                  required: [long, ident, help]
+                  properties:
+                    long: { type: string }
+                    ident: { type: string }
+                    help: { type: string }
+                    short: { type: string }
+
+              options:
+                type: list
+                items:
+                  type: object
+                  required: [long, ident, help, type]
+                  properties:
+                    long: { type: string }
+                    ident: { type: string }
+                    help: { type: string }
+                    short: { type: string }
+                    type: { type: string }
+                    required: { type: boolean }
+                    optional: { type: boolean }
+                    default: { type: string }
+
+              examples:
+                type: list
+                items:
+                  type: string
+
         examples:
           type: list
           items:
