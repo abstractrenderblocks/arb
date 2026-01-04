@@ -81,6 +81,44 @@ packages/docs-suite
 
 All outputs are generated from one source of truth.
 
+### 📦 cli-rust
+
+A Rust CLI generation package:
+
+packages/cli-rust
+
+**cli-rust** generates a fully working Rust command-line interface using
+`clap`, from a single validated YAML definition.
+
+It produces:
+
+- Rust `clap` command and subcommand enums
+- nested subcommands (e.g. `tool remote add`)
+- arguments, flags, and options
+- generated help and usage output
+- structured command dispatch scaffolding
+
+This package demonstrates arb being used as a **code generator**, including
+support for nested command trees.
+
+### 📦 config-schema
+
+A configuration definition and validation package:
+
+packages/config-schema
+
+**config-schema** turns a single configuration specification into multiple
+artifacts that stay in sync by construction.
+
+It produces:
+
+- `config.example.yaml` (human-readable example config)
+- `docs/config.md` (configuration reference documentation)
+- `config.schema.json` (JSON Schema for machine validation)
+
+This package demonstrates arb being used to generate configuration examples,
+documentation, and validation from a single source of truth.
+
 ---
 
 ## Try it in 60 seconds
