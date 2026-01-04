@@ -119,6 +119,28 @@ It produces:
 This package demonstrates arb being used to generate configuration examples,
 documentation, and validation from a single source of truth.
 
+### 📦 release-notes
+
+The repository includes a release documentation generator package:
+
+packages/release-notes
+
+**release-notes** turns a single validated YAML file into consistent, multi-format release documentation suitable for humans, changelogs, and automation:
+
+- `release.md` — user-facing release notes (Markdown)
+- `release.txt` — plain-text release notes (email / CLI / support)
+- `CHANGELOG.md` — structured changelog entry
+
+support for:
+
+- summaries and user impact
+- features, fixes, and changes
+- known issues
+- media references (screenshots, videos)
+- links, assets, and credits
+
+All outputs are generated from one source of truth, ensuring release communication stays accurate, consistent, and repeatable.
+
 ---
 
 ## Try it in 60 seconds

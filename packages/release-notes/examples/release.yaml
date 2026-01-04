@@ -1,0 +1,56 @@
+tool:
+  name: arb
+  repo_url: https://github.com/abstractrenderblocks/arb
+  license: MIT
+
+release:
+  version: 0.1.0
+  date: 2026-01-04
+  title: First public examples (cli-rust + config-schema)
+  audience: mixed
+  summary: >
+    Adds two example packages and improves docs. This release focuses on
+    showing realistic patterns for arb v1.
+
+  assets:
+    - label: Source (zip)
+      url: https://github.com/abstractrenderblocks/arb/archive/refs/tags/v0.1.0.zip
+    - label: Source (tar.gz)
+      url: https://github.com/abstractrenderblocks/arb/archive/refs/tags/v0.1.0.tar.gz
+
+  credits:
+    - name: Paul
+      note: Testing, feedback, and breakage reports
+
+  user_impact:
+    - text: No action required. This release adds example packages and documentation.
+
+sections:
+  - title: Added
+    items:
+      - text: config-schema package (example config + docs + JSON Schema from one definition)
+      - text: cli-rust package with nested clap subcommands (remote add/list)
+        ref_text: "pr 12"
+        
+  - title: Fixed
+    items:
+      - text: nested subcommand codegen errors in cli-rust templates
+        ref_text: "pr 13"
+
+  - title: Changed
+    items:
+      - text: Root README now lists all example packages
+
+known_issues:
+  - text: None known.
+
+media:
+  - type: image
+    label: Generated config reference output
+    url: https://example.com/config-docs.png
+
+links:
+  - label: Repo
+    url: https://github.com/abstractrenderblocks/arb
+  - label: Compare view
+    url: https://github.com/abstractrenderblocks/arb/compare/v0.0.9...v0.1.0

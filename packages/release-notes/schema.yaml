@@ -1,0 +1,108 @@
+type: object
+required: [tool, release, sections]
+properties:
+  tool:
+    type: object
+    required: [name, repo_url, license]
+    properties:
+      name: { type: string }
+      repo_url: { type: string }
+      license: { type: string }
+
+  release:
+    type: object
+    required: [version, date, title, summary]
+    properties:
+      version: { type: string }
+      date: { type: string }
+      title: { type: string }
+      summary: { type: string }
+
+      audience:
+        type: string  # "users" | "devs" | "mixed" (free-form)
+
+      assets:
+        type: list
+        items:
+          type: object
+          required: [label, url]
+          properties:
+            label: { type: string }
+            url: { type: string }
+
+      credits:
+        type: list
+        items:
+          type: object
+          required: [name]
+          properties:
+            name: { type: string }
+            note: { type: string }
+
+      user_impact:
+        type: list
+        items:
+          type: object
+          required: [text]
+          properties:
+            text: { type: string }
+
+  sections:
+    type: list
+    items:
+      type: object
+      required: [title, items]
+      properties:
+        ref_text: { type: string }
+        title: { type: string }
+        items:
+          type: list
+          items:
+            type: object
+            required: [text]
+            properties:
+              text: { type: string }
+
+              refs:
+                type: list
+                items:
+                  type: object
+                  required: [kind, id]
+                  properties:
+                    kind: { type: string } # "pr" | "issue" | "commit" (free-form)
+                    id: { type: string }   # allow commits too
+
+  known_issues:
+    type: list
+    items:
+      type: object
+      required: [text]
+      properties:
+        text: { type: string }
+        links:
+          type: list
+          items:
+            type: object
+            required: [label, url]
+            properties:
+              label: { type: string }
+              url: { type: string }
+
+  media:
+    type: list
+    items:
+      type: object
+      required: [type, label, url]
+      properties:
+        type: { type: string }  # "image" | "gif" | "video" (free-form)
+        label: { type: string }
+        url: { type: string }
+
+  links:
+    type: list
+    items:
+      type: object
+      required: [label, url]
+      properties:
+        label: { type: string }
+        url: { type: string }

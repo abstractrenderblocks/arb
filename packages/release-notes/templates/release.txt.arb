@@ -1,0 +1,32 @@
+{var}tool.name{/var} {var}release.version{/var} - {var}release.date{/var}
+{var}release.title{/var}
+
+{var}release.summary{/var}
+
+{if}release.audience
+Audience: {var}release.audience{/var}
+{/if}
+{if}release.user_impact
+USER IMPACT
+{rep}release.user_impact
+- {var}text{/var}
+{/rep}
+{/if}
+{rep}sections
+{var}title{/var}
+{rep}items
+- {var}text{/var}{if}refs ({rep}refs{var}kind{/var} {var}id{/var} {/rep}){/if}
+{/rep}
+{/rep}
+{if}known_issues
+KNOWN ISSUES
+{rep}known_issues
+- {var}text{/var}
+{/rep}
+{/if}
+{if}links
+LINKS
+{rep}links
+- {var}label{/var}: {var}url{/var}
+{/rep}
+{/if}
