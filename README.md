@@ -49,8 +49,6 @@ arb provides the following guarantees:
 - **Fail-fast behavior**  
   On error, no partial output is produced. arb does not delete previous output unless a compile completes successfully.
 
-These guarantees are defined in [`SPEC.md`](SPEC.md).
-
 ---
 
 ## Packages
@@ -213,12 +211,110 @@ arb init — Generate a starter data file from a package schema
 
 ---
 
+## Template Syntax (v1.1)
+
+arb supports the following template tags:
+
+### Variables
+
+```
+{var}path{/var}
+```
+
+Insert a required value from the YAML document.
+
+Example:
+
+```
+Hello {var}tool.name{/var}
+```
+
+Missing values are errors.
+
+You can also apply filters:
+
+```
+{var}tool.name | upper{/var}
+{var}description | lower{/var}
+{var}title | title{/var}
+{var}value | trim{/var}
+```
+
+Supported filters:
+
+- lower
+- upper
+- title
+- trim
+
+Filters are applied left-to-right.
+
+---
+
+### Conditionals
+
+```
+{if}path
+  true branch
+{else}
+  false branch
+{/if}
+```
+
+- Missing path = false
+- Supports nested {if}
+- Supports {else}
+- No elseif (yet)
+
+Example:
+
+```
+- Required: {if}required yes {else} no {/if}
+```
+
+---
+
+### Repetition
+
+```
+{rep}list_path
+  ...
+{/rep}
+```
+
+Iterates over a YAML list.
+
+Inside {rep}, the current item becomes the context.
+
+You can reference the entire item with:
+
+```
+{var}.{/var}
+```
+
+---
+
+### Includes
+
+```
+{inc}partials/header.arb{/inc}
+```
+
+Includes another template file relative to the current template.
+
+- Must end in .arb
+- Cannot escape the templates directory
+- Include cycles are detected
+- Depth limited for safety
+
+---
+
 ## Status
 
-arb v1 is intentionally minimal and design-locked.
-The goal is correctness, safety, and predictability — not feature breadth.
+v1.1 adds:
 
-Future versions may add capabilities, but v1 packages will remain supported.
+- {else} support
+- Filter support (lower, upper, title, trim)
 
 ---
 

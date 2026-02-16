@@ -1,14 +1,25 @@
 use crate::errors::ArbError;
 use serde_yaml::Value;
 
-/// Render a template string, supporting only `{var}` and `{if}`.
-/// - `{var}path{/var}` inserts a required value (missing => error)
-/// - `{if}path ... {/if}` conditionally renders body (missing => false)
+/// Render a template string supporting:
+/// - `{var}path{/var}`
+///     Inserts a required value (missing => error).
+///     Supports filters via `|`, e.g. `{var}name|upper|trim{/var}`.
+/// - `{if}path ... {else} ... {/if}`
+///     Conditionally renders content.
+///     Missing values evaluate as false.
+/// - `{rep}path ... {/rep}`
+///     Iterates over a sequence (missing => error).
+/// - `{inc}relative/path.arb{/inc}`
+///     Includes another template file (cycle-safe, depth-limited).
 ///
 /// Notes:
-/// - `{if}` blocks may contain nested `{if}` blocks and `{var}` tags.
-/// - `{rep}` blocks may contain other nested blocks
-/// - `{inc}` are NOT supported yet.
+/// - `{if}` blocks may be nested and support `{else}`.
+/// - `{rep}` blocks may contain nested `{if}`, `{var}`, `{rep}`, and `{inc}`.
+/// - `{inc}` renders using the current data context.
+/// - Dot paths (`foo.bar`) traverse YAML mappings.
+/// - `.` resolves to the current context inside `{rep}`.
+/// - Supported filters: `lower`, `upper`, `title`, `trim`.
 
 use std::path::Path;
 
@@ -67,7 +78,9 @@ fn render_inner(
                 .ok_or_else(|| template_err(template_rel, input, tag_start, "missing closing {/var}".to_string()))?;
 
             let raw_path = &input[i..close];
-            let path = raw_path.trim();
+            let raw = raw_path.trim();
+            let (path, filters) = parse_filters(raw);
+
             if path.is_empty() {
                 return Err(template_err(template_rel, input, tag_start, "empty {var} path".to_string()));
             }
@@ -81,7 +94,10 @@ fn render_inner(
                 )
             })?;
 
-            out.push_str(&stringify_value(v));
+            let mut out_val = stringify_value(v);
+            apply_filters(&mut out_val, filters)?;
+            out.push_str(&out_val);
+
             i = close + 6;
             continue;
         }
@@ -436,6 +452,7 @@ fn resolve_path<'a>(root: &'a Value, path: &str) -> Option<&'a Value> {
     Some(cur)
 }
 
+
 use std::path::{PathBuf, Component};
 
 fn resolve_include_path(
@@ -502,7 +519,6 @@ fn resolve_include_path(
     Ok((rel, abs))
 }
 
-
 fn is_truthy(v: &Value) -> bool {
     match v {
         Value::Null => false,
@@ -528,6 +544,13 @@ fn is_truthy(v: &Value) -> bool {
     }
 }
 
+fn parse_filters(raw: &str) -> (&str, Vec<&str>) {
+    let mut parts = raw.split('|');
+    let path = parts.next().unwrap().trim();
+    let filters = parts.map(|f| f.trim()).filter(|f| !f.is_empty()).collect();
+    (path, filters)
+}
+
 fn stringify_value(v: &Value) -> String {
     match v {
         Value::Null => "".to_string(),
@@ -541,6 +564,45 @@ fn stringify_value(v: &Value) -> String {
         }
     }
 }
+
+fn apply_filters(value: &mut String, filters: Vec<&str>) -> Result<(), ArbError> {
+    for f in filters {
+        match f {
+            "lower" => {
+                *value = value.to_lowercase();
+            }
+            "upper" => {
+                *value = value.to_uppercase();
+            }
+            "title" => {
+                *value = value
+                    .split_whitespace()
+                    .map(|w| {
+                        let mut c = w.chars();
+                        match c.next() {
+                            None => String::new(),
+                            Some(first) => first.to_uppercase().collect::<String>() + &c.as_str().to_lowercase(),
+                        }
+                    })
+                    .collect::<Vec<_>>()
+                    .join(" ");
+            }
+            "trim" => {
+                *value = value.trim().to_string();
+            }
+            _ => {
+                return Err(ArbError::Template {
+                    path: "<filter>".to_string(),
+                    line: 0,
+                    col: 0,
+                    message: format!("unknown filter '{f}'"),
+                });
+            }
+        }
+    }
+    Ok(())
+}
+
 
 fn template_err(path: &str, input: &str, at_index: usize, message: String) -> ArbError {
     let (line, col) = index_to_line_col(input, at_index);
