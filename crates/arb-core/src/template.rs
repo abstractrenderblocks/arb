@@ -228,12 +228,10 @@ fn render_inner(
             let tag_start = i;
             i += 4;
 
-            // Skip whitespace after {if}
             while i < bytes.len() && is_ws(bytes[i]) {
                 i += 1;
             }
 
-            // Read path token until whitespace
             let path_start = i;
             while i < bytes.len() && !is_ws(bytes[i]) {
                 i += 1;
@@ -244,7 +242,6 @@ fn render_inner(
                 return Err(template_err(template_rel, input, tag_start, "empty {if} path".to_string()));
             }
 
-            // Consume optional single newline after the path for readability
             if i < bytes.len() && bytes[i] == b'\r' {
                 i += 1;
                 if i < bytes.len() && bytes[i] == b'\n' {
@@ -253,39 +250,46 @@ fn render_inner(
             } else if i < bytes.len() && bytes[i] == b'\n' {
                 i += 1;
             } else {
-                // otherwise skip spaces/tabs before body
                 while i < bytes.len() && (bytes[i] == b' ' || bytes[i] == b'\t') {
                     i += 1;
                 }
             }
 
-            // Find matching {/if}, allowing nested {if} ... {/if}
-            let (body_end, close_end) = find_matching_if_close(bytes, i).ok_or_else(|| {
-                template_err(template_rel, input, tag_start, "missing closing {/if}".to_string())
-            })?;
+            let (body_end, close_end) =
+                find_matching_if_close(bytes, i)
+                .ok_or_else(|| template_err(template_rel, input, tag_start, "missing closing {/if}".to_string()))?;
 
             let body = &input[i..body_end];
 
+            // 🔥 NEW: split branches
+            let (true_branch, false_branch) =
+                split_if_branches(body, template_rel, input, tag_start)?;
+
             let cond = match resolve_path(data, path) {
                 Some(v) => is_truthy(v),
-                None => false, // per spec: missing => false
+                None => false,
             };
 
-            if cond {
-                let rendered_body = render_inner(
-                    templates_root,
-                    template_rel,
-                    body,
-                    data,
-                    depth + 1,
-                    include_stack,
-                )?;
-                out.push_str(&rendered_body);
-            }
+            let chosen = if cond {
+                true_branch
+            } else {
+                false_branch.unwrap_or("")
+            };
 
+            let rendered = render_inner(
+                templates_root,
+                template_rel,
+                chosen,
+                data,
+                depth + 1,
+                include_stack,
+            )?;
+
+            out.push_str(&rendered);
             i = close_end;
             continue;
         }
+
 
         // Normal char
         out.push(bytes[i] as char);
@@ -298,6 +302,43 @@ fn render_inner(
 fn is_ws(b: u8) -> bool {
     b == b' ' || b == b'\t' || b == b'\r' || b == b'\n'
 }
+
+fn split_if_branches<'a>(
+    body: &'a str,
+    template_rel: &str,
+    input: &str,
+    tag_start: usize,
+) -> Result<(&'a str, Option<&'a str>), ArbError> {
+
+    let bytes = body.as_bytes();
+    let mut i = 0;
+    let mut depth = 0;
+
+    while i < bytes.len() {
+        if starts_with(bytes, i, b"{if}") {
+            depth += 1;
+            i += 4;
+            continue;
+        }
+
+        if starts_with(bytes, i, b"{/if}") {
+            depth -= 1;
+            i += 5;
+            continue;
+        }
+
+        if depth == 0 && starts_with(bytes, i, b"{else}") {
+            let true_part = &body[..i];
+            let false_part = &body[i + 6..];
+            return Ok((true_part.trim(), Some(false_part.trim())));
+        }
+
+        i += 1;
+    }
+
+    Ok((body.trim(), None))
+}
+
 
 /// Finds the matching {/if} for a block starting at `from` (the body start),
 /// supporting nested {if} ... {/if}.
